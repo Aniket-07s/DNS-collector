@@ -38,14 +38,10 @@ global:
 #   transformers: https://github.com/dmachard/DNS-collector/blob/main/docs/transformers.md
 ################################################
 pipelines:
-  - name: tap
-    dnstap:
-      listen-ip: 0.0.0.0
-      listen-port: 6000
-    transforms:
-      normalize:
-        qname-lowercase: true
-        qname-replace-nonprintable: true
+  - name: sniffer
+    afpacket-sniffer:
+      port: 53
+      device: eth0
     routing-policy:
       forward: [ console ]
       dropped: [ ]

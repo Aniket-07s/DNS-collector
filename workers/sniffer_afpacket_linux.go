@@ -300,6 +300,7 @@ func (w *AfpacketSniffer) StartCollect() {
 			seconds := timestamp / int64(time.Second)
 			dm.DNSTap.TimeSec = int(seconds)
 			dm.DNSTap.TimeNsec = int(timestamp - seconds*int64(time.Second)*int64(time.Nanosecond))
+			// Cybersecurity Detection
 
 			// send DNS message to DNS processor
 			dnsProcessor.GetInputChannel() <- dm

@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/dmachard/go-dnscollector/dnsutils"
-	"github.com/dmachard/go-dnscollector/pkgconfig"
 	"github.com/dmachard/go-dnscollector/transformers"
+	"github.com/dmachard/go-dnscollector/pkgconfig"
 	"github.com/dmachard/go-logger"
 )
 
@@ -103,7 +103,9 @@ func (w *DNSProcessor) StartCollect() {
 				w.SendDroppedTo(droppedRoutes, droppedNames, dm)
 				continue
 			}
-
+			// Cybersecurity Detection
+			cyberDetector := transformers.NewCyberDetector()
+			cyberDetector.Detect(dm.DNS.Qname, dm.NetworkInfo.QueryIP)
 			// dispatch dns message to all generators
 			w.SendForwardedTo(defaultRoutes, defaultNames, dm)
 		}
