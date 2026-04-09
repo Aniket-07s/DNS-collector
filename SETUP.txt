@@ -1,0 +1,111 @@
+================================================
+DNS-COLLECTOR + CYBERSECURITY DETECTION
+By: Aniket
+GitHub: https://github.com/Aniket-07s/DNS-collector
+================================================
+
+PREREQUISITES
+--------------
+- Windows 10/11 with WSL2 (Ubuntu)
+- Go 1.21 or higher
+- Git
+
+STEP 1: INSTALL WSL (if not installed)
+----------------------------------------
+Open PowerShell as Administrator and run:
+    wsl --install
+Restart your PC after installation.
+
+STEP 2: INSTALL GO INSIDE WSL
+-------------------------------
+Open Ubuntu terminal and run:
+    sudo apt update
+    sudo apt install -y golang-go git tcpdump dnsutils
+    go version
+
+STEP 3: EXTRACT THE PROJECT
+-----------------------------
+Copy the zip file into WSL and extract:
+    cd ~
+    unzip dns-collector-project.zip
+    cd dns-collector
+
+OR clone directly from GitHub:
+    git clone https://github.com/Aniket-07s/DNS-collector.git
+    cd DNS-collector
+
+STEP 4: BUILD THE PROJECT
+---------------------------
+    go build -o dnscollector .
+
+STEP 5: RUN UNIT TESTS (no sudo needed)
+-----------------------------------------
+    go run test_detector.go
+
+Expected output:
+    === DNS Cybersecurity Detection Tests ===
+    [Test 1] Normal query - no alert expected
+      OK - no alert
+    [Test 2] DNS Tunneling - long subdomain
+    [ALERT] DNS TUNNELING - Long subdomain...
+    [Test 3] DNS Tunneling - high entropy
+    [ALERT] DNS TUNNELING - High entropy...
+    [Test 4] DGA Domain
+    [ALERT] DGA DOMAIN - Malware-generated domain...
+    [Test 5] High Query Rate - 100 queries
+    [ALERT] HIGH QUERY RATE - IP 10.0.0.8 made 100 queries in 60s!
+    === All Tests Done ===
+
+STEP 6: RUN LIVE DETECTION
+----------------------------
+Terminal 1 - Start the collector:
+    sudo ./dnscollector -config config.yml
+
+Terminal 2 - Generate normal traffic:
+    dig google.com @8.8.8.8
+
+Terminal 2 - Simulate DNS Tunneling attack:
+    dig xK9mP2vQ8nR5tL3wY7jB4hF6cZ1qA2sD3eF4gH5.evil-domain.com @8.8.8.8
+
+Watch Terminal 1 for [ALERT] messages!
+
+================================================
+FILES ADDED TO THIS PROJECT
+================================================
+
+transformers/cyber_detector.go
+    - Core detection engine
+    - DNS Tunneling detection (Shannon entropy + length)
+    - High Query Rate detection (per-IP rate tracking)
+    - DGA Domain detection (consonant ratio + entropy)
+
+workers/dnsprocessor.go
+    - Hooked CyberDetector into live DNS pipeline
+    - Detection runs after every DNS message is parsed
+
+test_detector.go
+    - Unit tests for all 3 detectors
+    - 5 tests, all passing
+
+README_DETECTION.md
+    - Full project documentation
+
+================================================
+HOW DETECTION WORKS
+================================================
+
+1. DNS TUNNELING
+   Hackers hide stolen data inside DNS queries.
+   Detection: Subdomain length > 50 chars OR entropy > 2.5
+   Example bad domain: aGVsbG8gdGhpcyBpcyBzdG9sZW4.evil.com
+
+2. DDOS / HIGH QUERY RATE
+   One IP sends hundreds of queries to overwhelm servers.
+   Detection: More than 100 queries from same IP in 60 seconds.
+
+3. DGA DOMAIN DETECTION
+   Malware auto-generates random domain names.
+   Detection: Entropy > 2.8 AND consonant ratio > 0.6
+   Example bad domain: xkqvbnmzxcvbnmqwrty.com
+
+================================================
